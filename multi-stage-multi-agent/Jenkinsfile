@@ -15,7 +15,7 @@ pipeline {
 
                 dir('multi-stage-multi-agent/backend') {
                     sh 'mvn --version'
-                    sh 'mvn clean test'
+                    sh 'mvn -Dmaven.repo.local=.m2/repository clean test'
                 }
             }
         }
