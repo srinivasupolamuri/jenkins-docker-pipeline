@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code from GitHub'
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing application'
+
+                sh '''
+                    test -f ci-cd-pipeline/index.html
+                    grep -q "CI/CD Pipeline Successful" ci-cd-pipeline/index.html
+
+                    echo "Test Passed: index.html is valid"
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application using Docker and Nginx'
+
+                sh '''
+                    docker rm -f ci-cd-app 2>/dev/null || true
+
+                    docker run -d \
+                        --name ci-cd-app \
+                        -p 8081:80 \
+                        -v "$WORKSPACE/ci-cd-pipeline/index.html:/usr/share/nginx/html/index.html:ro" \
+                        nginx:alpine
+
+                    echo "Application deployed successfully"
+                '''
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                echo 'Verifying deployment'
+
+                sh '''
+                    docker ps --filter name=ci-cd-app
+                    curl -f http://localhost:8081
+
+                    echo "Deployment verification successful"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI/CD Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'CI/CD Pipeline failed.'
+        }
+    }
+}
