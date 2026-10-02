@@ -1,0 +1,15 @@
+# Java / Maven build files
+multi-stage-multi-agent/backend/target/
+
+# Node.js dependencies
+multi-stage-multi-agent/frontend/node_modules/
+
+# Frontend build output
+multi-stage-multi-agent/frontend/dist/# Java / Maven build files
+multi-stage-multi-agent/backend/target/
+
+# Node.js dependencies
+multi-stage-multi-agent/frontend/node_modules/
+
+# Frontend build output
+multi-stage-multi-agent/frontend/dist/

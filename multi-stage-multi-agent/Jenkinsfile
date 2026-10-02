@@ -1,0 +1,55 @@
+pipeline {
+    agent none
+
+    stages {
+
+        stage('Backend') {
+            agent {
+                docker {
+                    image 'maven:3.9.16-eclipse-temurin-21-alpine'
+                }
+            }
+
+            steps {
+                echo 'Building and testing Java backend'
+
+                dir('multi-stage-multi-agent/backend') {
+                    sh 'mvn --version'
+                    sh 'mvn clean test'
+                }
+            }
+        }
+
+        stage('Frontend') {
+            agent {
+                docker {
+                    image 'node:22-alpine'
+                }
+            }
+
+            steps {
+                echo 'Building and testing Node.js frontend'
+
+                dir('multi-stage-multi-agent/frontend') {
+                    sh 'node --version'
+                    sh 'npm --version'
+                    sh 'npm install'
+                    sh 'npm test'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Result') {
+            agent {
+                docker {
+                    image 'node:22-alpine'
+                }
+            }
+
+            steps {
+                echo 'Backend and Frontend stages completed successfully'
+            }
+        }
+    }
+}
